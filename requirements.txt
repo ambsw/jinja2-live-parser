@@ -5,3 +5,4 @@ Jinja2==2.7.1
 #ipython==2.2.0
 #itsdangerous==0.24
 ansible==1.9.2
+lxml
