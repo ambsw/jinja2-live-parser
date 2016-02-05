@@ -23,13 +23,25 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <h1>Values (JSON)</h1>
+                <h1 style="display:inline-block">Values (JSON)</h1>
+                <div style="display:inline-block" id="settings">
+                    <input type="button" class="btn btn-success convert" value="Convert" />
+                </div>
+                <div class="control-group has-error">
+                    <b><span id="values-error" class="help-block"></span></b>
+                </div>
                 <textarea id="values">{% include 'example_values.html' %}</textarea>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <h1>Template</h1>
+                <h1 style="display:inline-block">Template</h1>
+                <div style="display:inline-block" id="settings">
+                    <input type="button" class="btn btn-success convert" value="Convert" />
+                </div>
+                <div class="control-group has-error">
+                    <b><span id="template-error" class="help-block"></span></b>
+                </div>
                 <textarea id="template">{% include 'example_template.html' %}</textarea>
             </div>
         </div>
@@ -37,10 +49,9 @@
             <div class="col-md-12">
                 <h1 style="display:inline-block">Render</h1>
                 <div style="display:inline-block" id="settings">
-                    <input type="button" class="btn btn-success" id="convert" value="Convert" />
-                    <input type="button" class="btn btn-danger" id="clear" value="Clear" />
+                    <input type="button" class="btn btn-success convert" value="Convert" />
                 </div>
-                <div id="render"></div>
+                <textarea id="render"></textarea>
             </div>
         </div>
     </form>

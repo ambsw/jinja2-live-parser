@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
+from pprint import pprint
+
 from flask import Flask, render_template, request
-from jinja2 import Environment, meta
+from jinja2 import Environment, meta, TemplateSyntaxError, StrictUndefined, UndefinedError
 
 # For dynamic loading of filters
 import imp
@@ -47,30 +49,25 @@ def hello():
 
 @app.route('/convert', methods=['GET', 'POST'])
 def convert():
-    dummy_values = ['Lorem', 'Ipsum', 'Amet', 'Elit', 'Expositum',
-                    'Dissimile', 'Superiori', 'Laboro', 'Torquate', 'sunt',
-                    ]
-
-    tpl = app.jinja_env.from_string(request.form['template'])
-    values = {}
-
-    if int(request.form['dummyvalues']):
-        # List variables (introspection)
-        env = Environment()
-        vars_to_fill = meta.find_undeclared_variables(env.parse(request.form['template']))
-
-        for v in vars_to_fill:
-            values[v] = choice(dummy_values)
+    try:
+        app.jinja_env.undefined = StrictUndefined
+        tpl = app.jinja_env.from_string(request.form['template'])
+    except TemplateSyntaxError as err:
+        response = {'template-error': "ERROR: " + err.message}
     else:
-        values = json.loads(request.form['values'])
+        values = {}
 
-    rendered_tpl = tpl.render(values)
+        try:
+            values = json.loads(request.form['values'])
+        except ValueError as err:
+            response = {'values-error': "ERROR: " + err.message}
+        else:
+            try:
+                response = {'render': tpl.render(values)}
+            except UndefinedError as err:
+                response = {'template-error': "ERRORS: " + err.message}
 
-    if int(request.form['showwhitespaces']):
-        # Replace whitespaces with a visible character (will be grayed with javascript)
-        rendered_tpl = rendered_tpl.replace(' ', u'•')
-
-    return rendered_tpl.replace('\n', '<br />')
+    return json.dumps(response)
 
 
 if __name__ == "__main__":
