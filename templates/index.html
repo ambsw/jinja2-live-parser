@@ -13,37 +13,34 @@
 <body>
     <form class="container">
         <div class="row">
-            <div class="col-md-5">
-                <h1>Template</h1>
-                <textarea id="template">{% include 'example_template.html' %}</textarea>
-            </div>
-            <div class="col-md-5">
-                <h1>Render</h1>
-                <div id="render"></div>
-            </div>
-            <div class="col-md-2">
-                <h1>Settings</h1>
-                <div id="settings">
-                    <label><input type="checkbox" name="showwhitespaces" checked="checked" /> Show whitespaces</label><br/>
-                    <label><input type="checkbox" name="dummyvalues" /> Use dummy values</label>
-                    <input type="button" class="btn btn-success" id="convert" value="Convert" />
-                    <input type="button" class="btn btn-danger" id="clear" value="Clear" />
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-5">
-                <h1>Values (JSON)</h1>
-                <textarea id="values">{% include 'example_values.html' %}</textarea>
-            </div>
-
-            <div class="col-md-5">
+            <div class="col-md-12">
                 <h1>Available Functions</h1>
                 <h3>mouse-over for doc-string</h3>
                 <table>
                   {% include 'functions.html' %}
                 </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Values (JSON)</h1>
+                <textarea id="values">{% include 'example_values.html' %}</textarea>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Template</h1>
+                <textarea id="template">{% include 'example_template.html' %}</textarea>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h1 style="display:inline-block">Render</h1>
+                <div style="display:inline-block" id="settings">
+                    <input type="button" class="btn btn-success" id="convert" value="Convert" />
+                    <input type="button" class="btn btn-danger" id="clear" value="Clear" />
+                </div>
+                <div id="render"></div>
             </div>
         </div>
     </form>
