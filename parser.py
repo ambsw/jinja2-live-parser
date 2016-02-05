@@ -65,7 +65,7 @@ def convert():
             try:
                 response = {'render': tpl.render(values)}
             except UndefinedError as err:
-                response = {'template-error': "ERRORS: " + err.message}
+                response = {'template-error': "ERROR: " + err.message}
 
     return json.dumps(response)
 
