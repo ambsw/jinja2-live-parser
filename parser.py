@@ -51,6 +51,8 @@ def hello():
 def convert():
     try:
         app.jinja_env.undefined = StrictUndefined
+        app.jinja_env.trim_blocks = True
+        app.jinja_env.lstrip_blocks = True
         tpl = app.jinja_env.from_string(request.form['template'])
     except TemplateSyntaxError as err:
         response = {'template-error': "ERROR: " + err.message}
