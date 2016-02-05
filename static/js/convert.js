@@ -7,6 +7,7 @@ $(document).ready(function(){
         }).done(function(json_response) {
             console.log(json_response);
             var response = JSON.parse(json_response);
+            $('#render').html("");
             $('#values-error').html("");
             $('#template-error').html("");
             if ("values-error" in response)
