@@ -51,7 +51,17 @@
                 <div style="display:inline-block" id="settings">
                     <input type="button" class="btn btn-success convert" value="Convert" />
                 </div>
+                <div class="control-group has-error">
+                    <b><span id="render-error" class="help-block"></span></b>
+                </div>
                 <textarea id="render" readonly="readonly"></textarea>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Settings</h1>
+                <label><input type="checkbox" name="xmlformat" checked="checked" />Pretty Print XML</label><br/>
+                <label><input type="checkbox" name="strictformat" checked="checked" />Strict Parsing (all variables must be present in JSON)</label>
             </div>
         </div>
     </form>

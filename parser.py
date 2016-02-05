@@ -10,6 +10,11 @@ import imp
 from inspect import getmembers, isfunction
 import os
 
+from pyexpat import ExpatError
+
+from lxml import etree
+from lxml.etree import XMLSyntaxError
+
 app = Flask(__name__)
 
 # Load filters in filters dir
@@ -50,24 +55,36 @@ def hello():
 @app.route('/convert', methods=['GET', 'POST'])
 def convert():
     try:
-        app.jinja_env.undefined = StrictUndefined
-        app.jinja_env.trim_blocks = True
-        app.jinja_env.lstrip_blocks = True
+        if int(request.form['strictformat']):
+            app.jinja_env.undefined = StrictUndefined
         tpl = app.jinja_env.from_string(request.form['template'])
     except TemplateSyntaxError as err:
         response = {'template-error': "ERROR: " + err.message}
     else:
         values = {}
+        response = {}
 
         try:
             values = json.loads(request.form['values'])
+            formatted = tpl.render(values)
         except ValueError as err:
-            response = {'values-error': "ERROR: " + err.message}
+            # Invalid JSON
+            response['values-error'] = "ERROR: " + err.message
+        except UndefinedError as err:
+            # Variable not present in template
+            response['template-error'] = "ERROR: " + err.message
         else:
-            try:
-                response = {'render': tpl.render(values)}
-            except UndefinedError as err:
-                response = {'template-error': "ERROR: " + err.message}
+            pprint(formatted)
+            if int(request.form['xmlformat']):
+                try:
+                    parser = etree.XMLParser(remove_blank_text=True)
+                    elem = etree.XML(formatted, parser=parser)
+                    formatted = etree.tostring(elem, pretty_print=True)
+                except XMLSyntaxError as err:
+                    # Template output was not valid XML
+                    response['render-error'] = "ERROR: Output was not valid XML "
+
+        response['render'] = formatted
 
     return json.dumps(response)
 
