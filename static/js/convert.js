@@ -2,6 +2,7 @@ $(document).ready(function(){
     $('.convert').click(function() {
         // Push the input to the Jinja2 api (Python)
         $.post('/convert', {
+            macros: $('#macros').val(),
             template: $('#template').val(),
             values: $('#values').val(),
             xmlformat: $('input[name="xmlformat"]').is(':checked') ? 1:0,
@@ -11,6 +12,7 @@ $(document).ready(function(){
             var response = JSON.parse(json_response);
             $('#render').html(response['render'] || "");
             $('#values-error').html(response['values-error'] || "");
+            $('#macros-error').html(response['macros-error'] || "");
             $('#template-error').html(response['template-error'] || "");
             $('#render-error').html(response['render-error'] || "");
 

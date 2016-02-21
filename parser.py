@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 from pprint import pprint
+from lxml import etree
+from lxml.etree import XMLSyntaxError
 
 from flask import Flask, render_template, request
 from jinja2 import Environment, meta, TemplateSyntaxError, StrictUndefined, UndefinedError
@@ -9,11 +11,6 @@ from jinja2 import Environment, meta, TemplateSyntaxError, StrictUndefined, Unde
 import imp
 from inspect import getmembers, isfunction
 import os
-
-from pyexpat import ExpatError
-
-from lxml import etree
-from lxml.etree import XMLSyntaxError
 
 app = Flask(__name__)
 
@@ -54,38 +51,51 @@ def hello():
 
 @app.route('/convert', methods=['GET', 'POST'])
 def convert():
+    # Verify that macros section compiles
     try:
         if int(request.form['strictformat']):
             app.jinja_env.undefined = StrictUndefined
-        tpl = app.jinja_env.from_string(request.form['template'])
+        # tpl = app.jinja_env.from_string(request.form['template'])
+        tpl = app.jinja_env.from_string(request.form['macros'])
+    except TemplateSyntaxError as err:
+        response = {'macros-error': "ERROR: " + err.message}
+        return json.dumps(response)
+    # Verify that macros plus template compile correctly
+    try:
+        if int(request.form['strictformat']):
+            app.jinja_env.undefined = StrictUndefined
+        # tpl = app.jinja_env.from_string(request.form['template'])
+        tpl = app.jinja_env.from_string(request.form['macros'] + "\n" + request.form['template'])
     except TemplateSyntaxError as err:
         response = {'template-error': "ERROR: " + err.message}
-    else:
-        values = {}
-        response = {}
+        return json.dumps(response)
 
+    response = {}
+
+    try:
+        values = json.loads(request.form['values'])
+        formatted = tpl.render(values)
+    except ValueError as err:
+        # Invalid JSON
+        response['values-error'] = "ERROR: " + err.message
+        return json.dumps(response)
+    except UndefinedError as err:
+        # Variable not present in template
+        response['macros-error'] = "ERROR: " + err.message
+        response['template-error'] = "ERROR: " + err.message
+        return json.dumps(response)
+
+    pprint(formatted)
+    if int(request.form['xmlformat']):
         try:
-            values = json.loads(request.form['values'])
-            formatted = tpl.render(values)
-        except ValueError as err:
-            # Invalid JSON
-            response['values-error'] = "ERROR: " + err.message
-        except UndefinedError as err:
-            # Variable not present in template
-            response['template-error'] = "ERROR: " + err.message
-        else:
-            pprint(formatted)
-            if int(request.form['xmlformat']):
-                try:
-                    parser = etree.XMLParser(remove_blank_text=True)
-                    elem = etree.XML(formatted, parser=parser)
-                    formatted = etree.tostring(elem, pretty_print=True)
-                except XMLSyntaxError as err:
-                    # Template output was not valid XML
-                    response['render-error'] = "ERROR: Output was not valid XML "
+            parser = etree.XMLParser(remove_blank_text=True)
+            elem = etree.XML(formatted, parser=parser)
+            formatted = etree.tostring(elem, pretty_print=True)
+        except XMLSyntaxError as err:
+            # Template output was not valid XML
+            response['render-error'] = "ERROR: Output was not valid XML "
 
-        response['render'] = formatted
-
+    response['render'] = formatted
     return json.dumps(response)
 
 
